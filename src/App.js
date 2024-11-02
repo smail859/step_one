@@ -6,7 +6,6 @@ function App() {
   return (
     <div>
       <Greeting message="Bonjour" name="Smaïl" />
-      <Greeting message="Bonjour" name="Alice" />
     </div>
   );
 }
