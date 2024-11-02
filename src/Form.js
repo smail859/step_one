@@ -1,57 +1,58 @@
 import { useState } from 'react';
 
 function Form() {
-    const [userName, setUsername] = useState("smail");
+    const [userName, setUsername] = useState("");
+    const [submittedUserName, setSubmittedUserName] = useState(""); // Nouvelle variable d'état pour le nom d'utilisateur soumis
     const [confirmPassword, setConfirmPassword] = useState(""); 
-    const [mail, setMail] = useState("smail@gmail.com");
+    const [mail, setMail] = useState("");
     const [password, setPassword] = useState("");
     const [submitted, setSubmitted] = useState(false); 
-    const [errorMessage, setErrorMessage] = useState(""); 
+    const [errorMessages, setErrorMessages] = useState([]); 
 
-    // Regex pour vérifier le format d'un email
     const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     const handleSubmitted = (event) => { 
         event.preventDefault();
-        verifPassword(); // Vérifie les mots de passe
-        verifUserName(); // Vérifie le nom d'utilisateur
-        veriEmail(); // Vérifie l'email
-        
-        // Si aucune erreur, soumets le formulaire
-        if (!errorMessage) {
+        const errors = [];
+
+        verifUserName(errors);
+        veriEmail(errors);
+        verifPassword(errors);
+
+        if (errors.length === 0) {
             setSubmitted(true);
-            // Réinitialiser les champs
-            setUsername("");
+            setSubmittedUserName(userName); // Met à jour le nom d'utilisateur soumis
+            setUsername(""); // Vide le champ de nom d'utilisateur
             setMail("");
             setPassword("");
             setConfirmPassword("");
-            setErrorMessage(""); // Réinitialise les messages d'erreur
+            setErrorMessages([]);
+        } else {
+            setErrorMessages(errors);
         }
     };
 
-    const verifPassword = () => {
-        if (password !== confirmPassword) {
-            setErrorMessage("Vous devez indiquer deux mots de passe identiques");
-        } else {
-            setErrorMessage("");
+    const verifPassword = (errors) => {
+        if (!password || !confirmPassword) {
+            errors.push("Les mots de passe ne peuvent pas être vides");
+        } else if (password !== confirmPassword) {
+            errors.push("Vous devez indiquer deux mots de passe identiques");
         }
-    }
+    };
 
-    const verifUserName = () => {
-        if (userName.length < 10) {
-            setErrorMessage("Vous devez indiquer un nom d'utilisateur avec au moins 10 lettres");
-        } else {
-            setErrorMessage("");
+    const verifUserName = (errors) => {
+        if (userName === "") {
+            errors.push("Le nom d'utilisateur est requis");
+        } else if (userName.length < 10) {
+            errors.push("Vous devez indiquer un nom d'utilisateur avec au moins 10 lettres");
         }   
-    }
+    };
 
-    const veriEmail = () => {
-        if (!regexEmail.test(mail)) { // Utilise .test() pour vérifier le format
-            setErrorMessage("Votre adresse mail n'est pas valide");
-        } else {
-            setErrorMessage("");
+    const veriEmail = (errors) => {
+        if (!regexEmail.test(mail)) { 
+            errors.push("Votre adresse mail n'est pas valide");
         }   
-    }
+    };
 
     return (
         <div>
@@ -61,19 +62,13 @@ function Form() {
                     type="text" 
                     placeholder="Entrez votre nom d'utilisateur" 
                     value={userName} 
-                    onChange={(e) => {
-                        setUsername(e.target.value);
-                        verifUserName(); // Vérifie à chaque changement
-                    }} 
+                    onChange={(e) => setUsername(e.target.value)} 
                 />
                 <input 
                     type="email" 
                     placeholder="Entrez votre adresse mail" 
                     value={mail} 
-                    onChange={(e) => {
-                        setMail(e.target.value);
-                        veriEmail(); // Vérifie l'email à chaque changement
-                    }} 
+                    onChange={(e) => setMail(e.target.value)} 
                 />
                 <input 
                     type="password" 
@@ -85,16 +80,15 @@ function Form() {
                     type="password" 
                     placeholder="Confirmer le mot de passe" 
                     value={confirmPassword}
-                    onChange={(e) => {
-                        setConfirmPassword(e.target.value); 
-                        verifPassword(); // Vérifie à chaque changement
-                    }} 
+                    onChange={(e) => setConfirmPassword(e.target.value)} 
                 />
                 <input type="file" />
                 <button type="submit">Création du profil</button>
                 
-                {submitted && !errorMessage && <p>Félicitation, votre profil est bien créé {userName}</p>}
-                {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
+                {/* Affiche le message de succès avec le nom d'utilisateur soumis */}
+                {submitted && errorMessages.length === 0 && <p>Félicitation, votre profil est bien créé {submittedUserName}</p>}
+                {/* Affiche les messages d'erreur */}
+                {errorMessages.length > 0 && errorMessages.map((msg, index) => <p key={index} style={{ color: 'red' }}>{msg}</p>)}
             </form>
         </div>
     );
