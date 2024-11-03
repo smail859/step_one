@@ -86,7 +86,18 @@ function Form() {
                 <button type="submit">Création du profil</button>
                 
                 {/* Affiche le message de succès avec le nom d'utilisateur soumis */}
+                {/* 
+                    Si "submitted" est vrai (true) ET "errorMessage" est faux (false), 
+                    alors on affiche le message suivant : 
+                    <p>Félicitation, votre profil est bien créé {userName}</p> 
+                */}
+
+                {submitted && errorMessages.length === 0 ? (
+                    <p>Félicitation, votre profil est bien créé : {submittedUserName}</p>
+                ) : null}
+                {/* Equivalent */}
                 {submitted && errorMessages.length === 0 && <p>Félicitation, votre profil est bien créé {submittedUserName}</p>}
+
                 {/* Affiche les messages d'erreur */}
                 {errorMessages.length > 0 && errorMessages.map((msg, index) => <p key={index} style={{ color: 'red' }}>{msg}</p>)}
             </form>
